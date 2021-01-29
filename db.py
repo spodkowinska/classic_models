@@ -75,12 +75,12 @@ def product_urls_list(product_line):
     product_ids = cursor.fetchall()
     product_urls = []
     for id in product_ids:
-        stripped_product = (str(id)).removeprefix('(').removesuffix(',)')
+        stripped_product = (str(id)).removeprefix("(\'").removesuffix("\',)")
         product_urls.append(create_url("productline", stripped_product))
     return product_urls
 
 
-def product_lines_from_database():
+def products_lines_from_database():
     select_query = ("SELECT * FROM productlines")
 
     cursor = connection.cursor(dictionary=True)
@@ -93,13 +93,12 @@ def product_lines_from_database():
 
 
 def product_line_from_database(productline):
-    select_query = ("SELECT * FROM productLine WHERE productLine = %s")
+    select_query = ("SELECT * FROM productlines WHERE productLine = %s")
     cursor = connection.cursor(dictionary=True)
     cursor.execute(select_query, (productline,))
     result = cursor.fetchall()
-    result[0]['products']= create_url("products", result[0]['products'])
-    result[0]['buyPrice'] = str(result['buyPrice'])
-    result[0]['products'] = create_url("products", result[0]['products'])
+    urls_list = product_urls_list(productline)
+    result[0]["products"] = urls_list
 
     return result
 
@@ -111,7 +110,7 @@ def products_from_database():
     cursor.execute(select_query)
     result = cursor.fetchall()
     for row in result:
-        row['productLine']= create_url("productline", row['productLine'])
+        row['productLine'] = create_url("productline", row['productLine'])
     print(result)
     return result
 
